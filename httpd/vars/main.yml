@@ -1,0 +1,5 @@
+---
+# vars file for httpd
+
+p: "httpd"
+doc: "/var/www/html"

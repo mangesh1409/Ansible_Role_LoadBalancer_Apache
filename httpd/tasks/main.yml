@@ -1,0 +1,45 @@
+---
+# tasks file for httpd
+
+  - name: Make directory
+    file:
+     path: /dvd
+     state: directory
+  - name: Mount DVD read-only / Mount CDRom to /dvd directory
+    mount:
+     path: /dvd
+     src: /dev/sr0
+     state: mounted
+     fstype: iso9660
+  - name: Add repositories
+    yum_repository:
+     name: AppStream
+     description: Packages from Appstream
+     baseurl: file:///dvd/AppStream
+     gpgcheck: no
+  - name: Add repositories
+    yum_repository:
+     name: BaseOS
+     description: Packages from BaseOS
+     baseurl: file:///dvd/BaseOS
+     gpgcheck: no
+  - name: Install Httpd software
+    package:
+     name: "{{p}}"
+     state: present
+  - name: Copy web pages
+    template:
+     src: index.html
+     dest: "{{doc}}"
+  - name: Start httpd service
+    service:
+     state: started
+     name: "{{p}}"
+     enabled: yes
+  - name: disable firewall
+    firewalld:
+     state: enabled
+     permanent: no
+     immediate: yes
+     port: 80/tcp
+

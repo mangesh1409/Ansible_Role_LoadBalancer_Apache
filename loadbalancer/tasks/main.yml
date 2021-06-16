@@ -1,0 +1,43 @@
+---
+# tasks file for loadbalancer
+
+  - name: Make directory
+    file:
+     path: /dvd
+     state: directory
+  - name: Mount DVD read-only / Mount CDRom to /dvd directory
+    mount:
+     path: /dvd
+     src: /dev/sr0
+     state: mounted
+     fstype: iso9660
+  - name: Add repositories
+    yum_repository:
+     name: AppStream
+     description: Packages from Appstream
+     baseurl: file:///dvd/AppStream
+     gpgcheck: no
+  - name: Add repositories
+    yum_repository:
+     name: BaseOS
+     description: Packages from BaseOS
+     baseurl: file:///dvd/BaseOS
+     gpgcheck: no
+  - name: Install load balancer software
+    package:
+      name: haproxy
+  - name: Copy configuration file
+    template:
+      dest: /etc/haproxy/haproxy.cfg
+      src: 02_haproxy.cfg.j2
+  - name: Start Haproxy service
+    service:
+     state: restarted
+     name: haproxy
+     enabled: yes
+  - name: disable firewall
+    firewalld:
+     state: enabled
+     permanent: no
+     immediate: yes
+     port: 8080/tcp  

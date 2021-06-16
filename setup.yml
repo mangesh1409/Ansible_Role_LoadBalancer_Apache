@@ -1,0 +1,10 @@
+- hosts: [BackendServer]
+  roles:
+  - role: "httpd" 	
+
+
+
+- hosts: [Loadbalancer]
+  roles:
+  - role: "loadbalancer" 
+
